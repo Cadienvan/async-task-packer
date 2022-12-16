@@ -5,13 +5,6 @@
 import { OptionsChunk, OptionsInterval } from './types';
 
 export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
-  // Save a list of functions
-  const currentBatch: (() => Promise<unknown>)[] = [];
-  let isExecuting = false;
-  const queue: (() => Promise<unknown>)[] = [];
-
-  let internalInterval: NodeJS.Timeout | null = null;
-
   if (['interval', 'chunk'].indexOf(options.executionMethod) === -1) {
     throw new Error('Invalid execution method');
   }
@@ -20,15 +13,28 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
     throw new Error('Invalid execution type');
   }
 
+  // Provide some defaults
+  options.waitForAll = options.waitForAll ?? true;
+  options.expectFullfillment = options.expectFullfillment ?? false;
+
+  if (options.executionMethod === 'interval') {
+    options.debounce = options.debounce ?? false;
+  }
+
+  const currentBatch: (() => Promise<unknown>)[] = [];
+
+  let isExecuting = false;
+
+  const queue: (() => Promise<unknown>)[] = [];
+
+  let internalInterval: NodeJS.Timeout | null = null;
+
   async function executeBatch() {
     if (isExecuting) {
       return;
     }
     isExecuting = true;
     const result: Array<any> = [];
-    // Every element in the batch is a function.
-    // If the execution type is strict, we need to execute the batch in order.
-    // If the execution type is loose, we can execute the batch in any order.
 
     if (options.executionType === 'strict') {
       // Execute the batch in order.
@@ -116,18 +122,36 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
     }
   }
 
-  if (options.executionMethod === 'interval') {
-    options = options as OptionsInterval;
-    internalInterval = setInterval(() => {
-      if (currentBatch.length > 0) {
-        executeBatch();
-      }
-    }, options.interval);
-    internalInterval.unref(); // Don't keep the process alive.
+  function launchInterval() {
+    if (options.executionMethod === 'interval') {
+      options = options as OptionsInterval;
+      internalInterval = setInterval(() => {
+        if (currentBatch.length > 0) {
+          executeBatch();
+        }
+      }, options.interval);
+      internalInterval.unref();
+    }
   }
 
-  function batcher(fn: () => void) {
-    addToQueue(queue, fn);
+  function stopInterval() {
+    if (internalInterval) {
+      clearInterval(internalInterval);
+    }
   }
+
+  function relaunchInterval() {
+    stopInterval();
+    launchInterval();
+  }
+
+  function batcher(fn: () => Promise<unknown>) {
+    addToQueue(queue, fn);
+    if (options.executionMethod === 'interval')
+      options.debounce && relaunchInterval();
+  }
+
+  launchInterval();
+
   return batcher;
 };

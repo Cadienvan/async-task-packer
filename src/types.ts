@@ -9,6 +9,7 @@ export type OptionsInterval = OptionsGeneric & {
   executionMethod: 'interval';
   executionType: 'loose' | 'strict';
   interval: number;
+  debounce?: boolean;
 };
 
 export type OptionsChunk = OptionsGeneric & {
