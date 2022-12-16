@@ -1,6 +1,6 @@
 {
-  "name": "@cadienvan/packtr",
-  "description": "A low footprint and unopinionated execution aggregator",
+  "name": "packtr",
+  "description": "This is a zero-dependency and low-footprint library that allows you to pack a set of asynchronous tasks and execute them in a controlled way. It allows you to execute those tasks in time-based intervals or in size-based chunks.  ",
   "private": false,
   "version": "0.0.1",
   "main": "dist/index.js",
@@ -17,7 +17,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "ts-types": " tsc --emitDeclarationOnly --outDir dist",
+    "ts-types": "tsc --emitDeclarationOnly --outDir dist",
     "check": "npm run prettier && npm run lint && npm test",
     "build": "npm run check && rimraf dist && NODE_ENV=production node esbuild.js && npm run ts-types",
     "prettier": "prettier --write ./src",
@@ -64,6 +64,17 @@
     "npm",
     "package",
     "typescript",
-    "scaffolding"
+    "pack",
+    "async",
+    "tasks",
+    "queue",
+    "packtr",
+    "chunk",
+    "interval",
+    "chunks",
+    "intervals",
+    "promise",
+    "promises",
+    "await"
   ]
 }
