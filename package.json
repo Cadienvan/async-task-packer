@@ -1,8 +1,8 @@
 {
-  "name": "@cadienvan/npm-package-ts-scaffolding",
-  "description": "A scaffolding for npm packages written in TypeScript",
+  "name": "@cadienvan/packtr",
+  "description": "A low footprint and unopinionated execution aggregator",
   "private": false,
-  "version": "0.3.1",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,6 @@
     "ts-types": " tsc --emitDeclarationOnly --outDir dist",
     "check": "npm run prettier && npm run lint && npm test",
     "build": "npm run check && rimraf dist && NODE_ENV=production node esbuild.js && npm run ts-types",
-    "demo-test": "for file in demo/*.js; do node $file; done",
     "prettier": "prettier --write ./src",
     "lint": "eslint ./src --ext .ts",
     "dev": "jest --watch",
@@ -57,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Cadienvan/npm-package-ts-scaffolding.git"
+    "url": "git://github.com/Cadienvan/packtr.git"
   },
   "license": "MIT",
   "author": "Michael Di Prisco <cadienvan@gmail.com>",
@@ -66,11 +65,5 @@
     "package",
     "typescript",
     "scaffolding"
-  ],
-  "contributors": [
-    {
-      "name": "Antonio Caputo",
-      "url": "https://github.com/tonycaputome"
-    }
   ]
 }
