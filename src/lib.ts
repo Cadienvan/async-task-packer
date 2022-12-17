@@ -59,22 +59,14 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
         try {
           result.push(await pack[i]());
         } catch (error: unknown) {
-          if (options.onCatch) {
-            options.onCatch(error);
-          } else {
-            throw error;
-          }
+          manageErrorCatching(error);
         }
       }
     } else if (options.executionType === 'loose') {
       for (let i = 0; i < pack.length; i++) {
         result.push(
           pack[i]().catch((error: unknown) => {
-            if (options.onCatch) {
-              options.onCatch(error);
-            } else {
-              throw error;
-            }
+            manageErrorCatching(error);
           })
         );
       }
@@ -96,6 +88,18 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
       fillPackFromQueueAndExecute();
     }
     return result;
+  }
+
+  function manageErrorCatching(error: unknown) {
+    if (!options.expectResolutions) {
+      throw error;
+    }
+
+    if (options.onCatch) {
+      options.onCatch(error);
+    } else {
+      throw error;
+    }
   }
 
   function addToQueue(queue: (() => void)[], fn: () => void) {
@@ -131,6 +135,7 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
   }
 
   function shouldPackBeExecuted() {
+    if (isPackExecuting) return false;
     if (options.executionMethod === 'interval') {
       return false;
     } else if (options.executionMethod === 'chunk') {
