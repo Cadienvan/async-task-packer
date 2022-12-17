@@ -1,3 +1,9 @@
+#### 1.0.1 (2022-12-17)
+
+##### Chores
+
+*  removed example file ([68ac57e9](https://github.com/Cadienvan/async-task-packer/commit/68ac57e959302c669626c91a9fb158ec631f70bf))
+
 ## 1.0.0 (2022-12-17)
 
 ##### Chores
