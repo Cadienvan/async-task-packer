@@ -4,7 +4,7 @@
 
 import { OptionsChunk, OptionsInterval } from './types';
 
-export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
+export const createPacker = (options: OptionsInterval | OptionsChunk) => {
   if (['interval', 'chunk'].indexOf(options.executionMethod) === -1) {
     throw new Error('Invalid execution method');
   }
@@ -13,34 +13,51 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
     throw new Error('Invalid execution type');
   }
 
+  if (options.executionMethod === 'interval') {
+    if (
+      typeof options.interval !== 'number' ||
+      isNaN(options.interval) ||
+      options.interval < 0
+    ) {
+      throw new Error('Invalid interval');
+    }
+  }
+
+  if (options.executionMethod === 'chunk') {
+    if (typeof options.chunkSize !== 'number') {
+      throw new Error('Invalid chunk size');
+    }
+  }
+
   // Provide some defaults
-  options.waitForAll = options.waitForAll ?? true;
-  options.expectFullfillment = options.expectFullfillment ?? false;
+  options.awaitAllTasks = options.awaitAllTasks ?? true;
+  options.expectResolutions = options.expectResolutions ?? false;
 
   if (options.executionMethod === 'interval') {
     options.debounce = options.debounce ?? false;
+    options.unref = options.unref ?? false;
   }
 
-  const currentBatch: (() => Promise<unknown>)[] = [];
+  const pack: (() => Promise<unknown>)[] = [];
 
-  let isExecuting = false;
+  let isPackExecuting = false;
 
   const queue: (() => Promise<unknown>)[] = [];
 
   let internalInterval: NodeJS.Timeout | null = null;
 
-  async function executeBatch() {
-    if (isExecuting) {
+  async function executePack() {
+    if (isPackExecuting) {
       return;
     }
-    isExecuting = true;
+    isPackExecuting = true;
     const result: Array<any> = [];
 
     if (options.executionType === 'strict') {
       // Execute the batch in order.
-      for (let i = 0; i < currentBatch.length; i++) {
+      for (let i = 0; i < pack.length; i++) {
         try {
-          result.push(await currentBatch[i]());
+          result.push(await pack[i]());
         } catch (error: unknown) {
           if (options.onCatch) {
             options.onCatch(error);
@@ -50,9 +67,9 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
         }
       }
     } else if (options.executionType === 'loose') {
-      for (let i = 0; i < currentBatch.length; i++) {
+      for (let i = 0; i < pack.length; i++) {
         result.push(
-          currentBatch[i]().catch((error: unknown) => {
+          pack[i]().catch((error: unknown) => {
             if (options.onCatch) {
               options.onCatch(error);
             } else {
@@ -62,63 +79,63 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
         );
       }
     }
-    currentBatch.length = 0;
-    if (options.onBatchExecute) {
-      options.onBatchExecute(result);
+    pack.length = 0;
+    if (options.onPackExecution) {
+      options.onPackExecution(result);
     }
 
-    if (options.waitForAll === true) {
+    if (options.awaitAllTasks === true) {
       Promise.all(result)[
-        options.expectFullfillment === true ? 'all' : 'finally'
+        options.expectResolutions === true ? 'then' : 'finally'
       ](() => {
-        isExecuting = false;
-        fillBatchFromQueueAndExecute();
+        isPackExecuting = false;
+        fillPackFromQueueAndExecute();
       });
     } else {
-      isExecuting = false;
-      fillBatchFromQueueAndExecute();
+      isPackExecuting = false;
+      fillPackFromQueueAndExecute();
     }
     return result;
   }
 
   function addToQueue(queue: (() => void)[], fn: () => void) {
     queue.push(fn);
-    if (!isExecuting) {
-      fillBatchFromQueueAndExecute();
+    if (!isPackExecuting) {
+      fillPackFromQueueAndExecute();
     }
   }
 
-  function fillBatchFromQueueAndExecute() {
-    fillBatchFromQueue();
-    if (shouldBatchBeExecuted()) executeBatch();
+  function fillPackFromQueueAndExecute() {
+    fillPackFromQueue();
+    if (shouldPackBeExecuted()) executePack();
   }
 
-  function fillBatchFromQueue() {
+  function fillPackFromQueue() {
     if (queue.length === 0) {
       return;
     }
     if (options.executionMethod === 'interval') {
       // Move all the items from the queue to the current batch.
-      currentBatch.push(...queue);
+      pack.push(...queue);
       queue.length = 0;
       return;
     } else if (options.executionMethod === 'chunk') {
       options = options as OptionsChunk;
       const itemsToMove = Math.min(
         queue.length,
-        options.chunkSize - currentBatch.length
+        options.chunkSize - pack.length
       );
-      currentBatch.push(...queue.splice(0, itemsToMove));
+      pack.push(...queue.splice(0, itemsToMove));
       return;
     }
   }
 
-  function shouldBatchBeExecuted() {
+  function shouldPackBeExecuted() {
     if (options.executionMethod === 'interval') {
       return false;
     } else if (options.executionMethod === 'chunk') {
       options = options as OptionsChunk;
-      return currentBatch.length >= options.chunkSize;
+      return pack.length >= options.chunkSize;
     }
   }
 
@@ -126,11 +143,11 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
     if (options.executionMethod === 'interval') {
       options = options as OptionsInterval;
       internalInterval = setInterval(() => {
-        if (currentBatch.length > 0) {
-          executeBatch();
+        if (pack.length > 0) {
+          executePack();
         }
       }, options.interval);
-      internalInterval.unref();
+      options.unref && internalInterval.unref();
     }
   }
 
@@ -145,7 +162,7 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
     launchInterval();
   }
 
-  function batcher(fn: () => Promise<unknown>) {
+  function handler(fn: () => Promise<unknown>) {
     addToQueue(queue, fn);
     if (options.executionMethod === 'interval')
       options.debounce && relaunchInterval();
@@ -153,5 +170,5 @@ export const createPacktr = (options: OptionsInterval | OptionsChunk) => {
 
   launchInterval();
 
-  return batcher;
+  return handler;
 };

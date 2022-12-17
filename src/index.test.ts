@@ -1,4 +1,4 @@
-import { createPacktr } from './index';
+import { createPacker } from './index';
 
 const createPromise = (timeout: number, counter: number) => {
   return () => {
@@ -18,11 +18,11 @@ it('should return the correct batch responses in chunk-strict configuration', as
     [1, 2, 3],
     [4, 5, 6]
   ];
-  const myPacktr = createPacktr({
+  const myPacktr = createPacker({
     executionMethod: 'chunk',
     executionType: 'strict',
     chunkSize: 3,
-    onBatchExecute: (result) => {
+    onPackExecution: (result) => {
       Promise.all(result).then((r) => {
         expect(r).toEqual(expects.shift());
       });
@@ -42,11 +42,11 @@ it('should return the correct batch responses in chunk-loose configuration', asy
     [3, 2, 1],
     [6, 5, 4]
   ];
-  const myPacktr = createPacktr({
+  const myPacktr = createPacker({
     executionMethod: 'chunk',
     executionType: 'loose',
     chunkSize: 3,
-    onBatchExecute: (result) => {
+    onPackExecution: (result) => {
       const looseResponse: any[] = [];
       for (const r of result) {
         r.then((res) => {
@@ -69,11 +69,11 @@ it('should return the correct batch responses in chunk-loose configuration', asy
 
 it('should return the correct batch responses in interval-strict configuration', async () => {
   const expects = [[1, 2, 3, 4, 5, 6]];
-  const myPacktr = createPacktr({
+  const myPacktr = createPacker({
     executionMethod: 'interval',
     executionType: 'strict',
     interval: 100,
-    onBatchExecute: (result) => {
+    onPackExecution: (result) => {
       Promise.all(result).then((r) => {
         expect(r).toEqual(expects.shift());
       });
@@ -90,11 +90,11 @@ it('should return the correct batch responses in interval-strict configuration',
 
 it('should return the correct batch responses in interval-loose configuration', async () => {
   const expects = [[6, 5, 4, 3, 2, 1]];
-  const myPacktr = createPacktr({
+  const myPacktr = createPacker({
     executionMethod: 'interval',
     executionType: 'loose',
     interval: 100,
-    onBatchExecute: (result) => {
+    onPackExecution: (result) => {
       const looseResponse: any[] = [];
       for (const r of result) {
         r.then((res) => {

@@ -1,5 +1,5 @@
 {
-  "name": "packtr",
+  "name": "async-task-packer",
   "description": "This is a zero-dependency and low-footprint library that allows you to pack a set of asynchronous tasks and execute them in a controlled way. It allows you to execute those tasks in time-based intervals or in size-based chunks.  ",
   "private": false,
   "version": "0.0.1",
@@ -56,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Cadienvan/packtr.git"
+    "url": "git://github.com/Cadienvan/async-task-packer.git"
   },
   "license": "MIT",
   "author": "Michael Di Prisco <cadienvan@gmail.com>",
@@ -68,13 +68,15 @@
     "async",
     "tasks",
     "queue",
-    "packtr",
+    "async-task-packer",
     "chunk",
     "interval",
     "chunks",
     "intervals",
     "promise",
     "promises",
-    "await"
+    "await",
+    "task",
+    "packer"
   ]
 }
