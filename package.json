@@ -2,7 +2,7 @@
   "name": "async-task-packer",
   "description": "This is a zero-dependency and low-footprint library that allows you to pack a set of asynchronous tasks and execute them in a controlled way. It allows you to execute those tasks in time-based intervals or in size-based chunks.  ",
   "private": false,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
