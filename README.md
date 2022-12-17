@@ -197,26 +197,26 @@ Of course, results will vary every time you run it because of the random timeout
 
 The `createPacker` function accepts an object with the following properties:
 
-- `executionMethod` (*required*): The execution method to use. It can be either `chunk` or `interval`.
+- `executionMethod` (_required_): The execution method to use. It can be either `chunk` or `interval`.
   - If you choose `chunk` as the execution method, you can also provide the following properties:
-    - `chunkSize` (*required*): The size of the chunk to use. It must be a positive integer.
+    - `chunkSize` (_required_): The size of the chunk to use. It must be a positive integer.
   - If you choose `interval` as the execution method, you can also provide the following properties:
-    - `interval` (*required*): The interval to use. It must be a positive integer.
-    - `debounce` (*optional*): A boolean indicating whether the interval should be debounced or not. Defaults to `false`.
-    - `unref` (*optional*): A boolean indicating whether the interval should be unrefed or not. Defaults to `false`. (https://nodejs.org/api/timers.html#timers_timeout_unref)
-- `executionType` (*required*): The execution type to use. It can be either `strict` or `loose`.
+    - `interval` (_required_): The interval to use. It must be a positive integer.
+    - `debounce` (_optional_): A boolean indicating whether the interval should be debounced or not. Defaults to `false`. Setting it to `true` will cause the interval to be reset every time a new task is added to the pack.
+    - `unref` (_optional_): A boolean indicating whether the interval should be unrefed or not. Defaults to `false`. (https://nodejs.org/api/timers.html#timers_timeout_unref)
+- `executionType` (_required_): The execution type to use. It can be either `strict` or `loose`.
   - If you choose `strict` as the execution type, the packer will execute the tasks in the order they were added to the pack.
   - If you choose `loose` as the execution type, the packer will execute the tasks in parallel and will not enforce the order they were added to the pack.
 
 To better control the pack flow, you can also pass the following properties:
 
-- `expectResolutions` (*optional*): A boolean indicating whether the packer should expect the tasks to be resolved or not. Defaults to `false`.
-  - If set to `false`, the packer will consider the pack as resolved as soon as the tasks are executed, regardless of whether they are resolved or rejected.
+- `expectResolutions` (_optional_): A boolean indicating whether the packer should expect the tasks to be resolved or not. Defaults to `false`.
+  - If set to `false`, the packer will consider the pack as resolved as soon as the tasks are completed, regardless of whether they are resolved or rejected.
   - If set to `true`, the packer will consider the pack as resolved only if all the tasks are resolved. If one of the tasks is rejected, the packer will consider the pack as rejected and will call the packer `onCatch` method if provided or will throw the error if no `onCatch` method is provided.
-- `awaitAllTasks` (*optional*): A boolean indicating whether the packer should wait for all the tasks to be executed before resolving the pack. Defaults to `false`.
+- `awaitAllTasks` (_optional_): A boolean indicating whether the packer should wait for all the tasks to be executed before resolving the pack. Defaults to `false`.
   - If set to `false`, the packer will resolve the pack as soon as the tasks are executed.
   - If set to `true`, the packer will wait for all the tasks to be executed before resolving the pack.  
-    *Please note that this option will immediately fill the pack with the tasks currently in the queue if conditions are met. It means a new pack could potentially be created and executed even if the previous one is not yet resolved.*
+    _Please note that this option will immediately fill the pack with the tasks currently in the queue if conditions are met. It means a new pack could potentially be created and executed even if the previous one is not yet resolved._
 - `onCatch`: A function to be called when an error is thrown. It will be called with the error as the first argument. If not provided, the error will be thrown instead.
 - `onPackExecution`: A function to be called when a pack is executed. It will be called with the array of executed tasks (Promises yet to be resolved or rejected) as the first argument.
 
@@ -258,6 +258,5 @@ The library will execute the tasks in the queue according to the configuration t
 
 # ToDo
 
-- [ ] expectResolutions amount?
 - [ ] Tests - Better coverage.
 - [ ] Analysis - How to allow pack execution in `chunk` mode without reaching the chunk size?
