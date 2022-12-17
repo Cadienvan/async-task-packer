@@ -33,6 +33,10 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
   options.awaitAllTasks = options.awaitAllTasks ?? true;
   options.expectResolutions = options.expectResolutions ?? false;
 
+  if (!options.awaitAllTasks && options.expectResolutions) {
+    throw new Error('Cannot expect resolutions when not awaiting all tasks');
+  }
+
   if (options.executionMethod === 'interval') {
     options.debounce = options.debounce ?? false;
     options.unref = options.unref ?? false;
