@@ -1,3 +1,9 @@
+#### 1.1.1 (2022-12-19)
+
+##### Chores
+
+*  removed example file ([fb9018fc](https://github.com/Cadienvan/async-task-packer/commit/fb9018fc7ded871852b2f23d00b0ccabd43246fb))
+
 ### 1.1.0 (2022-12-19)
 
 ##### Documentation Changes
