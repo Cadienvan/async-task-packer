@@ -18,3 +18,9 @@ export type OptionsChunk = OptionsGeneric & {
   executionType: 'loose' | 'strict';
   chunkSize: number;
 };
+
+export type QueueableFunction = (
+  ...args: unknown[]
+) => Promise<unknown> | unknown;
+export type Queue = QueueableFunction[];
+export type Pack = QueueableFunction[];

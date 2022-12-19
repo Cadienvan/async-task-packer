@@ -2,9 +2,16 @@
 // and returns a function which takes a function as an argument.
 // The function passed to the returned function will be called using a setInterval provided by the options.
 
-import { OptionsChunk, OptionsInterval } from './types';
+import {
+  OptionsChunk,
+  OptionsInterval,
+  Pack,
+  Queue,
+  QueueableFunction
+} from './types';
 
 export const createPacker = (options: OptionsInterval | OptionsChunk) => {
+  // Validation
   if (['interval', 'chunk'].indexOf(options.executionMethod) === -1) {
     throw new Error('Invalid execution method');
   }
@@ -29,33 +36,33 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
     }
   }
 
-  // Provide some defaults
-  options.awaitAllTasks = options.awaitAllTasks ?? true;
-  options.expectResolutions = options.expectResolutions ?? false;
-
   if (!options.awaitAllTasks && options.expectResolutions) {
     throw new Error('Cannot expect resolutions when not awaiting all tasks');
   }
+
+  // Defaults
+  options.awaitAllTasks = options.awaitAllTasks ?? true;
+  options.expectResolutions = options.expectResolutions ?? false;
 
   if (options.executionMethod === 'interval') {
     options.debounce = options.debounce ?? false;
     options.unref = options.unref ?? false;
   }
 
-  const pack: (() => Promise<unknown>)[] = [];
+  // Internal state
+  const queue: Queue = [];
+  const pack: Pack = [];
 
   let isPackExecuting = false;
-
-  const queue: (() => Promise<unknown>)[] = [];
-
   let internalInterval: NodeJS.Timeout | null = null;
 
+  // Internal API
   async function executePack() {
     if (isPackExecuting) {
       return;
     }
     isPackExecuting = true;
-    const result: Array<any> = [];
+    const result: Array<Promise<unknown> | unknown> = [];
 
     if (options.executionType === 'strict') {
       // Execute the batch in order.
@@ -68,11 +75,20 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
       }
     } else if (options.executionType === 'loose') {
       for (let i = 0; i < pack.length; i++) {
-        result.push(
-          pack[i]().catch((error: unknown) => {
+        // Check if pack[i] is a promise, if it is catch it, if it is not wrap it in a try-catch
+        if (isPromise(pack[i])) {
+          result.push(
+            (pack[i]() as Promise<unknown>).catch((error: unknown) => {
+              manageErrorCatching(error);
+            })
+          );
+        } else {
+          try {
+            result.push(pack[i]());
+          } catch (error: unknown) {
             manageErrorCatching(error);
-          })
-        );
+          }
+        }
       }
     }
     pack.length = 0;
@@ -171,8 +187,9 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
     launchInterval();
   }
 
-  function handler(fn: () => Promise<unknown>) {
-    addToQueue(queue, fn);
+  // Public API
+  function handler(fn: QueueableFunction, ...args: unknown[]) {
+    addToQueue(queue, () => fn(...args));
     if (options.executionMethod === 'interval')
       options.debounce && relaunchInterval();
   }
@@ -181,3 +198,11 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
 
   return handler;
 };
+
+function isPromise(obj) {
+  return (
+    !!obj &&
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+  );
+}
