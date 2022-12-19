@@ -73,6 +73,7 @@ it('should return the correct batch responses in interval-strict configuration',
     executionMethod: 'interval',
     executionType: 'strict',
     interval: 100,
+    unref: true,
     onPackExecution: (result) => {
       Promise.all(result).then((r) => {
         expect(r).toEqual(expects.shift());
@@ -94,6 +95,7 @@ it('should return the correct batch responses in interval-loose configuration', 
     executionMethod: 'interval',
     executionType: 'loose',
     interval: 100,
+    unref: true,
     onPackExecution: (result) => {
       const looseResponse: any[] = [];
       for (const r of result) {
