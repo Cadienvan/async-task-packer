@@ -18,6 +18,56 @@ npm install async-task-packer
 Create a packer by calling the `createPacker` function and pass it the configuration you want to use.  
 Then, wrap your async functions with the resulting function to add them to the pack.
 
+## Use-case #1 - Delayed logger
+
+```javascript
+const packer = createPacker({
+  executionMethod: 'interval',
+  executionType: 'loose',
+  interval: 1000
+});
+
+const logger = (message) => {
+  const createdAt = new Date();
+  packer(() => {
+    sendLogToAnExternalApi(message, createdAt);
+  });
+};
+
+logger('Hello');
+logger('World');
+```
+
+## Use-case #2 - Analytics chunk-based packer
+
+In this scenario, we want to send a batch of events to an external API.  
+We want to send the events in chunks of 10, but we also want to send the events after 10 seconds, even if the chunk is not full, to prevent losing important information.  
+We don't care about event ordering (`loose` type) as we provide a `createdAt` timestamp in the event payload and we can sort the events on the server side.
+  
+  ```javascript
+  const packer = createPacker({
+    executionMethod: 'chunk',
+    executionType: 'loose',
+    chunkSize: 10,
+    maxChunkLifetime: 10*1000 // Using a debounce mechanism, the packer will execute the pack after 10 seconds, even if it's not full
+  });
+
+  const track = (event, ...args) => {
+    const createdAt = new Date();
+    packer(() => {
+      sendEventToAnExternalApi(event, createdAt, ...args);
+    });
+  };
+
+  track('user_login', { userId: 123 });
+  track('item_added_to_cart', { cartUUID: 'abc', itemId: 456 });
+  track('item_added_to_cart', { cartUUID: 'abc', itemId: 789 });
+  track('order_completed', { cartUUID: 'abc' });
+  track('user_logout', { userId: 123 });
+```
+
+
+
 ## Example #1 - Chunk Method, Strict Type
 
 ```javascript
@@ -200,6 +250,8 @@ The `createPacker` function accepts an object with the following properties:
 - `executionMethod` (_required_): The execution method to use. It can be either `chunk` or `interval`.
   - If you choose `chunk` as the execution method, you can also provide the following properties:
     - `chunkSize` (_required_): The size of the chunk to use. It must be a positive integer.
+    - `maxChunkLifetime` (_optional_): The maximum lifetime of a chunk. It must be a positive integer. Defaults to `600000` (10 minutes).
+    - `unref` (_optional_): A boolean indicating whether the interval should be unrefed or not. Defaults to `false`. (https://nodejs.org/api/timers.html#timers_timeout_unref)
   - If you choose `interval` as the execution method, you can also provide the following properties:
     - `interval` (_required_): The interval to use. It must be a positive integer.
     - `debounce` (_optional_): A boolean indicating whether the interval should be debounced or not. Defaults to `false`. Setting it to `true` will cause the interval to be reset every time a new task is added to the pack.
@@ -259,4 +311,3 @@ The library will execute the tasks in the queue according to the configuration t
 # ToDo
 
 - [ ] Tests - Better coverage.
-- [ ] Analysis - How to allow pack execution in `chunk` mode without reaching the chunk size?
