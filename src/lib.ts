@@ -24,14 +24,18 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
     if (
       typeof options.interval !== 'number' ||
       isNaN(options.interval) ||
-      options.interval < 0
+      options.interval <= 0
     ) {
       throw new Error('Invalid interval');
     }
   }
 
   if (options.executionMethod === 'chunk') {
-    if (typeof options.chunkSize !== 'number') {
+    if (
+      typeof options.chunkSize !== 'number' ||
+      isNaN(options.chunkSize) ||
+      options.chunkSize <= 0
+    ) {
       throw new Error('Invalid chunk size');
     }
   }
@@ -115,10 +119,6 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
   }
 
   function manageErrorCatching(error: unknown) {
-    if (!options.expectResolutions) {
-      throw error;
-    }
-
     if (options.onCatch) {
       options.onCatch(error);
     } else {
