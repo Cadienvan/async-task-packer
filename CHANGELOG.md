@@ -1,3 +1,24 @@
+### 1.1.0 (2022-12-19)
+
+##### Documentation Changes
+
+*  aligned docs with new oncatch mechanism ([79edc03b](https://github.com/Cadienvan/async-task-packer/commit/79edc03b44609b406db35529182f10ea560bd077))
+*  documented max chunk lifetime + added use cases ([c438cae2](https://github.com/Cadienvan/async-task-packer/commit/c438cae259a51d6f7bef9653ab05df58d4b4ba62))
+
+##### New Features
+
+*  added a max chunk lifetime option to the chunk exec method ([56e0b616](https://github.com/Cadienvan/async-task-packer/commit/56e0b6168bc1bc3a373c6007513d679e6a5b6bc5))
+*  allowed arguments to be passed to the returned function + better types ([5b94bc05](https://github.com/Cadienvan/async-task-packer/commit/5b94bc05073d341418552d081042727b8a8ee4a4))
+
+##### Bug Fixes
+
+*  oncatch would not be called if expect resolution was set to false ([305be4f8](https://github.com/Cadienvan/async-task-packer/commit/305be4f8a0668076c9a9532a3daf9378aeac6751))
+
+##### Tests
+
+*  improved code coverage to 86 out of 100 ([9168bd41](https://github.com/Cadienvan/async-task-packer/commit/9168bd415fb5041451da1ada4244d6f4407a3366))
+*  added timeoutunref to prevent open handlings ([94e5da40](https://github.com/Cadienvan/async-task-packer/commit/94e5da40be7f6faddd8ba77e7639db1a2f4a7515))
+
 #### 1.0.1 (2022-12-17)
 
 ##### Chores
