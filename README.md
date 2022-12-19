@@ -263,7 +263,7 @@ The `createPacker` function accepts an object with the following properties:
 To better control the pack flow, you can also pass the following properties:
 
 - `expectResolutions` (_optional_): A boolean indicating whether the packer should expect the tasks to be resolved or not. Defaults to `false`.
-  - If set to `false`, the packer will consider the pack as resolved as soon as the tasks are completed, regardless of whether they are resolved or rejected.
+  - If set to `false`, the packer will consider the pack as resolved as soon as the tasks are completed, regardless of whether they are resolved or rejected. Setting this option to false still allows you to catch errors by providing an `onCatch` method.
   - If set to `true`, the packer will consider the pack as resolved only if all the tasks are resolved. If one of the tasks is rejected, the packer will consider the pack as rejected and will call the packer `onCatch` method if provided or will throw the error if no `onCatch` method is provided.
 - `awaitAllTasks` (_optional_): A boolean indicating whether the packer should wait for all the tasks to be executed before resolving the pack. Defaults to `false`.
   - If set to `false`, the packer will resolve the pack as soon as the tasks are executed.
