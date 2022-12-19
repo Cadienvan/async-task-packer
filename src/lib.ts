@@ -49,6 +49,10 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
     options.unref = options.unref ?? false;
   }
 
+  if (options.executionMethod === 'chunk') {
+    options.maxChunkLifetime = options.maxChunkLifetime ?? 600000;
+  }
+
   // Internal state
   const queue: Queue = [];
   const pack: Pack = [];
@@ -173,6 +177,14 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
         }
       }, options.interval);
       options.unref && internalInterval.unref();
+    } else if (options.executionMethod === 'chunk') {
+      options = options as OptionsChunk;
+      internalInterval = setInterval(() => {
+        if (pack.length > 0) {
+          executePack();
+        }
+      }, options.maxChunkLifetime);
+      options.unref && internalInterval.unref();
     }
   }
 
@@ -192,6 +204,7 @@ export const createPacker = (options: OptionsInterval | OptionsChunk) => {
     addToQueue(queue, () => fn(...args));
     if (options.executionMethod === 'interval')
       options.debounce && relaunchInterval();
+    else if (options.executionMethod === 'chunk') relaunchInterval();
   }
 
   launchInterval();
