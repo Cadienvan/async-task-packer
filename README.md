@@ -20,6 +20,9 @@ Then, wrap your async functions with the resulting function to add them to the p
 
 ## Use-case #1 - Delayed logger
 
+In this scenario, we want to send a log to an external API.  
+We want to pack the logs in a time-based interval of 1 second, but we don't care about the order of the logs (`loose` type) as we provide a `createdAt` timestamp in the log payload and we can sort the logs on the server side.
+
 ```javascript
 const packer = createPacker({
   executionMethod: 'interval',
@@ -272,12 +275,7 @@ To better control the pack flow, you can also pass the following properties:
 - `onCatch`: A function to be called when an error is thrown. It will be called with the error as the first argument. If not provided, the error will be thrown instead.
 - `onPackExecution`: A function to be called when a pack is executed. It will be called with the array of executed tasks (Promises yet to be resolved or rejected) as the first argument.
 
-# Considerations about chunk size
-
-As of right now, if a chunk size is provided but not reached, the packer will not execute the tasks in the pack.  
-This means that if you provide a chunk size of 3 and you add 2 tasks to the packer, the packer will not execute the tasks until you add another task to the packer.  
-Please, keep this in mind when using the `chunk` execution method.
-
+The packer function accepts an async function as its first argument. You can pass the function parameters as the following arguments (It wraps the given function in an anonymous function that accepts the parameters and returns the function call).
 # Tests
 
 You can run the tests by using the following command:
