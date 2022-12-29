@@ -8,7 +8,7 @@ import {
   Pack,
   Queue,
   QueueableFunction
-} from './types';
+} from './models';
 
 export const createPacker = (options: OptionsInterval | OptionsChunk) => {
   // Validation
