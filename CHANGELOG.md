@@ -1,3 +1,18 @@
+#### 1.1.2 (2023-04-22)
+
+##### Chores
+
+*  internal naming refactor ([5b62a909](https://github.com/Cadienvan/async-task-packer/commit/5b62a909dfebc1a5acafea70f726883b9352abb6))
+
+##### Continuous Integration
+
+*  Added Node 20 in ci test matrix ([16b4a108](https://github.com/Cadienvan/async-task-packer/commit/16b4a10809c4d79829241f8162f5064c61b839c1))
+*  Added Node CI ([5a027965](https://github.com/Cadienvan/async-task-packer/commit/5a02796577ccaf3de4761add11abcd5a4b59dc64))
+
+##### Documentation Changes
+
+*  updated documentation about the packer returned function ([2d2ab5f7](https://github.com/Cadienvan/async-task-packer/commit/2d2ab5f7a9bea6759d94cf3e787a0551b9820251))
+
 #### 1.1.1 (2022-12-19)
 
 ##### Chores
