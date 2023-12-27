@@ -1,3 +1,9 @@
+#### 1.1.3 (2023-12-27)
+
+##### Chores
+
+*  update dependencies ([0b8da723](https://github.com/Cadienvan/async-task-packer/commit/0b8da723a45671ae5eee998daa13c401084808b0))
+
 #### 1.1.2 (2023-04-22)
 
 ##### Chores
