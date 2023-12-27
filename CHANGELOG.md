@@ -1,3 +1,9 @@
+#### 1.1.4 (2023-12-27)
+
+##### Tests
+
+*  fixing unused var ([390d5b73](https://github.com/Cadienvan/async-task-packer/commit/390d5b73b8c423a43516dc5ef507e582e252de18))
+
 #### 1.1.3 (2023-12-27)
 
 ##### Chores
