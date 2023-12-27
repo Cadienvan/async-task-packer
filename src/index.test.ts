@@ -160,7 +160,7 @@ describe('functional tests', () => {
       executionType: 'strict',
       chunkSize: 2,
       unref: true,
-      onCatch: (error) => {
+      onCatch: () => {
         expect(true).toBe(true);
       }
     });
